@@ -1,11 +1,98 @@
 import torch
-import torch.nn as nn
+
 import cv2
 from ultralytics import YOLO
-import time
+
 from test import track
-model = YOLO()
+import requests
+from send_udp import send_data, send_tcp
+
+import numpy as np
+import socket
+import time
+
+
+# host = "192.168.0.1"
+
+# model = YOLO()
 stream = cv2.VideoCapture(0)
+
+
+def vision_api():
+    global stream
+    
+    if not stream.isOpened():
+        stream = cv2.VideoCapture(0,cv2.CAP_DSHOW)
+    while(True):
+        # print("in loop")
+        #frame is a 480 x 640 x 3 array
+        
+        ret, frame = stream.read()
+       
+        # results = model.predict(frame, stream=False)
+        frame = frame.tolist()
+        
+        response = requests.post("http://localhost:5000/vision", json={"img":frame})
+        results, min_idx = response.json()
+        # results = model.predict(frame, stream=False)
+            
+        speed, right, left = track(results[min_idx], results[min_idx] > 0)
+        print(f"MOVE {"RIGHT" if right else "LEFT"} at {speed} SPEED!")
+
+
+        # cv2.imshow('video', frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    stream.release()
+
+    cv2.destroyAllWindows()
+
+def vision_socket():
+    global stream
+    try:
+        if not stream.isOpened():
+            stream = cv2.VideoCapture(0,cv2.CAP_DSHOW)
+
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect(('127.0.0.1',8000))
+        # sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        while(True):
+            # print("in loop")
+            #frame is a 480 x 640 x 3 array
+
+            ret, frame = stream.read()
+            
+            frame = np.array(frame)
+            # print(frame.size)
+            # results = model.predict(frame, stream=False)
+            # frame = np.split(frame, 32, axis=0)
+            time_start = time.time()
+            results = send_tcp(frame,sock)#, host="34.46.63.237"
+            print(f"TIME DATA: {time.time()-time_start}")
+            # print(results)
+            if results == 0:
+                continue
+            # response = requests.post("http://localhost:5000/vision", json={"img":frame})
+            
+            # response = send_data(frame, port=8080)
+            # response = None
+            # results, min_idx = response.json()
+            # results = model.predict(frame, stream=False)
+                
+            speed, right, left = track(results, results > 0)
+            
+            print(f"MOVE {"RIGHT" if right else "LEFT"} at {speed} SPEED!")
+
+
+            # cv2.imshow('video', frame)
+            # if cv2.waitKey(1) & 0xFF == ord('q'):
+            #     break
+    except Exception as e:
+        print(e)
+    finally:
+        stream.release()
+        sock.close()
 
 def vision():
 
@@ -67,3 +154,7 @@ def vision():
     cv2.destroyAllWindows()
 
 
+if __name__ == "__main__":
+    vision_socket()
+
+    
