@@ -40,7 +40,8 @@ def stop():
     motorSpeed.ChangeDutyCycle(0)
 
 def track(x_distance:float, direction:bool):
-    return math.ceil(((x_distance)**2)*200 + 10), direction, not direction
+    #proposed: math.ceil(((x_distance-0.5)*20)**2)
+    return math.ceil(((x_distance)**2)*100 + 50), direction, not direction
 
 
 
