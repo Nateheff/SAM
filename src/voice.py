@@ -5,7 +5,7 @@ import json
 from threading import Thread
 from queue import Queue
 import requests
-from vision import vision
+from vision.vision import vision
 
 #TO DO:
 """
@@ -25,7 +25,7 @@ models = ["vosk-model-en-us-daanzu-20200905/vosk-model-en-us-daanzu-20200905", "
 model = Model(model_path=models[0])
 recognizer = KaldiRecognizer(model, 16000)
 recognizer.SetWords(True)
-print("Model loaded")
+# print("Model loaded")
 p = pyaudio.PyAudio()
 
 stream = p.open(format=pyaudio.paInt16,
@@ -46,16 +46,21 @@ recordings = Queue()
 #     data = stream.read(BUFFER_SIZE)
 #     frames.append(data)
 
+"""
+
+each time we get 5 more words, or 3 seconds pass, 
+we check if
+"""
 def record():
     frames = []
-    t_end = time.time() + 5
+    t_end = time.time() + 3
     while stream.is_active():
         data = stream.read(BUFFER_SIZE)
         frames.append(data)
         if time.time() > t_end:
             recordings.put(frames.copy())
             frames = []
-            t_end = time.time() + 5
+            t_end = time.time() + 3
             print("Running")
         
 
@@ -104,26 +109,7 @@ def real_time_rec():
 
         
         
-def run():
-    
-    while True:
-        task = real_time_rec()
-        try:
-            match task:
-                case "1043": #[TURRET]
-                    vision()
-                case "1032" | "1037" | "1049" | "1054": # [WEATHER] | [TIME] | [MUSIC] | [DATE]
-                    raise(NotImplementedError("Functionality for this command has not yet been implemented."))
-                case _:
-                    raise(ValueError("The inputted prompt has produced an invalid token, suggesting the prompt was not a valid command. Please try to provide clear commands to the model for what task(s) you would like it to perform. For example: Sam play some music or Sam red alert."))
-                
-        except Exception as e:
-            print(e)
-        except KeyboardInterrupt as e:
-            stream.stop_stream()
-            stream.close()
-            p.terminate()
-            exit()
+
 
             
 
@@ -138,8 +124,8 @@ def run():
 # if task == "1043":
 #     vision()
 # print("DONE: ",task)
-if __name__ == "__main__":
-    run()
+# if __name__ == "__main__":
+#     run()
 
         
 

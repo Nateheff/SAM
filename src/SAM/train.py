@@ -4,7 +4,7 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader, Dataset
 from datasets import load_dataset
 
-from model import Nate, Config
+from SAM import Nate, Config
 from Tokenizer import Tokenizer
 from helpers import get_batch, create_targets, pad
 from SAM.data import create_tok_dataset, create_dataset

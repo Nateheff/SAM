@@ -3,7 +3,7 @@ import pickle
 import sys
 sys.path.append("../Nate")
 from helpers import get_stats, merge
-from model import Config
+from SAM import Config
 import torch
 #regex.compile(pattern)
 # https://github.com/Zjh-819/LLMDataHub
