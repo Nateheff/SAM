@@ -1,38 +1,18 @@
-import time
-from gpiozero import OutputDevice
-import RPi.GPIO as GPIO
+import gpiod
+import gpiozero
 
-
-load_speed = None
-
+fire_motor, load_motor = None
 def gun_init():
-    GPIO.setmode(GPIO.BOARD)
+    global fire_motor, load_motor
+    fire_motor = gpiozero.OutputDevice(pin=18, active_high=True, initial_value=False)
+    load_motor = gpiozero.Motor(20,21)
 
-    GPIO.setup(12, GPIO.OUT)
-
-    GPIO.setup(36, GPIO.OUT)
-    GPIO.setup(38, GPIO.OUT) #load motor
-    GPIO.setup(40, GPIO.OUT) #fire motor
-
-    load_speed = GPIO.PWM(36, 60)
-    load_speed.start(0)
-    
 
 def fire():
-    GPIO.output(12, True)
-
-    GPIO.output(40, True)
-    GPIO.output(38, False)
-    load_speed.ChangeDutyCycle(100)
+    fire_motor.on()
+    load_motor.forward()
 
 
 def cease_fire():
-    GPIO.output(38, False)
-    GPIO.output(40, False)
-
-    GPIO.output(12, False)
-
-    load_speed.ChangeDutyCycle(0)
-    load_speed.stop(0)
-
-    GPIO.cleanup()
+    fire_motor.off()
+    load_motor.stop()

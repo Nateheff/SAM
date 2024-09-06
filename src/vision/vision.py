@@ -5,9 +5,9 @@ import time
 
 from YoloFastestV2.detector import Detector
 import utils.utils
-from motor import motor_init, move, stop
+from motor_rpi4 import motor_init, move, stop
 from tracking import track
-from gun import *
+from gun_rpi4 import *
 
 
 model = Detector()

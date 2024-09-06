@@ -1,45 +1,39 @@
-from gpiozero import Motor, OutputDevice, PMWOutputDevice
-import RPi.GPIO as GPIO
-import time
+import gpiod
+import gpiozero
 
-motor_speed = None
+motor_speed, left_pin, right_pin = None
 
 def motor_init():
-    GPIO.setmode(GPIO.BOARD)
 
-    GPIO.setup(16, GPIO.OUT) #right
-    GPIO.setup(18, GPIO.OUT) #left
-    GPIO.setup(22, GPIO.OUT) 
 
-    motor_speed = GPIO.PWM(22, 20)
-    motor_speed.start(0)
+
+    left_pin = gpiozero.OutputDevice(pin=23, active_high=True, initial_value=False)
+
+    right_pin = gpiozero.OutputDevice(pin=24, active_high=True, initial_value=False)
+
+    motor_speed = gpiozero.PWMOutputDevice(pin=25, frequency=50, intial_value=0)
+    motor_speed.on()
+    motor_speed.value = 0.0
+    # motor_speed.start(0)
 
 
 def right(speed):
-    GPIO.output(16, True)
-    GPIO.output(18, False)
+    left_pin.off()
+    right_pin.on()
 
-    motor_speed.ChangeDutyCycle(speed)
+    motor_speed.value = speed
 
 
 def left(speed):
-    GPIO.output(16, False)
-    GPIO.output(18, True)
+    right_pin.off()
+    left_pin.on()
 
-    motor_speed.ChangeDutyCycle(speed)
+    motor_speed.value = speed
 
 
 def stop():
-    GPIO.output(16, False)
-    GPIO.output(18, False)
-    motor_speed.ChangeDutyCycle(0)
+    right_pin.off()
+    left_pin.off()
+    motor_speed.value = 0.0
+    motor_speed.off()
 
-    motor_speed.stop(0)
-    GPIO.cleanup()
-
-
-def move(right: bool, speed:int):
-    if right:
-        right(speed)
-    else:
-        left(speed)
