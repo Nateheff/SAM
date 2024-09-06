@@ -1,7 +1,7 @@
 import gpiod
 import gpiozero
 
-motor_speed, left_pin, right_pin = None
+motor_speed, left_pin, right_pin = None, None, None
 
 def motor_init():
 

@@ -1,7 +1,7 @@
 import gpiod
 import gpiozero
 
-fire_motor, load_motor = None
+fire_motor, load_motor = None, None
 def gun_init():
     global fire_motor, load_motor
     fire_motor = gpiozero.OutputDevice(pin=18, active_high=True, initial_value=False)
