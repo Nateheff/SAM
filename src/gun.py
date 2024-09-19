@@ -11,7 +11,7 @@ def gun_init():
 
     on_pin = gpiozero.OutputDevice(pin=21, active_high=True, initial_value=False)
 
-    load_motor = gpiozero.PWMOutputDevice(pin=16, frequency=50, intial_value=0)
+    load_motor = gpiozero.PWMOutputDevice(pin=16, frequency=50, initial_value=0)
     load_motor.on()
     load_motor.value = 0.0
 

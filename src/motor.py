@@ -11,7 +11,7 @@ def motor_init():
 
     right_pin = gpiozero.OutputDevice(pin=24, active_high=True, initial_value=False)
 
-    motor_speed = gpiozero.PWMOutputDevice(pin=25, frequency=50, intial_value=0)
+    motor_speed = gpiozero.PWMOutputDevice(pin=25, frequency=50, initial_value=0)
     motor_speed.on()
     motor_speed.value = 0.0
     # motor_speed.start(0)

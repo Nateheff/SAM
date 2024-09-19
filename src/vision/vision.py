@@ -68,5 +68,11 @@ def vision():
             stop()
             cease_fire()
 
-
+"""
+add test function
+change paths of files in backbone and here
+get venv going
+download all the requirements (torch,numpy,cv2, torchvision,gpiozero,lgpio,etc.)
+change speed and direction
+"""
             
