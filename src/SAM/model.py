@@ -272,3 +272,47 @@ class Nate(nn.Module):
         return prompt
 
 
+class NateClass(nn.Module):
+    def __init__(self, config:ModelConfig):
+        super().__init__()
+        self.config = config
+        self.token_embedding = nn.Embedding(self.config.vocab_size, self.config.n_embd)
+        self.position_embedding = nn.Embedding(self.config.max_context_length, self.config.n_embd)
+        self.layers = nn.ModuleList([Block(config) for i in range(self.config.n_layers)])
+        self.norm = RMSNorm(self.config.n_embd, self.config.norm_eps)
+        self.lin1 = nn.Linear(self.config.n_embd * self.config.max_context_length, 4096)
+        self.gelu = nn.GELU()
+        self.out = nn.Linear(4096, config.vocab_size)
+
+    def forward(self, x:torch.tensor, target=None):
+        B,T = x.shape
+        tok_embd = self.token_embedding(x)
+        pos_embd = self.position_embedding(torch.arange(T, device=device))
+        x = tok_embd + pos_embd
+        for block in self.layers:
+            x = block(x)
+        x = self.norm(x)
+        x = x.reshape((B, self.config.n_embd * T))
+        x = self.lin1(x)
+        x = self.gelu(x)
+        x = self.out(x)
+        
+        if target is not None:
+            # x = F.softmax(x, dim=-1)
+            loss_fn = nn.CrossEntropyLoss()
+            # target = target.view(B*self.config.vocab_size)
+            # x = x.view(B*self.config.vocab_size)
+            
+            loss = loss_fn(x,target)
+        else:
+            loss = 0
+        return x, loss
+
+    def generate(self, prompt:torch.tensor):
+        logits, loss = self(prompt)
+        probs = F.softmax(logits, dim=-1)
+        
+        idx = probs.argmax(dim=-1, keepdim=True)
+        return idx
+
+

@@ -4,10 +4,10 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader, Dataset
 from datasets import load_dataset
 
-from SAM import Nate, Config
+from model import Nate, Config
 from Tokenizer import Tokenizer
 from helpers import get_batch, create_targets, pad
-from SAM.data import create_tok_dataset, create_dataset
+from data import create_tok_dataset, create_dataset
 
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'

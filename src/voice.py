@@ -53,14 +53,14 @@ we check if
 """
 def record():
     frames = []
-    t_end = time.time() + 2
+    t_end = time.time() + 1
     while stream.is_active():
         data = stream.read(BUFFER_SIZE)
         frames.append(data)
         if time.time() > t_end:
             recordings.put(frames.copy())
             frames = []
-            t_end = time.time() + 2
+            t_end = time.time() + 1
             print("Running")
         
 

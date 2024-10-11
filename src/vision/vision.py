@@ -47,7 +47,7 @@ def vision():
 
                 ret, frame = stream.read()
 
-                data = cv2.resize(frame, (352,352), interpolation=cv2.INTER_LINEAR)
+                data = cv2.resize(frame, (352,352), interpolation = cv2.INTER_LINEAR)
                 img = data.reshape(1, 352, 352, 3)
                 img = torch.from_numpy(img.transpose(0,3, 1, 2))
                 img = img.float() / 255.0
